@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
+import axios from 'axios';
+
 
 const CreateGroupForm = () => {
-  const { register, handleSubmit, watch, control, } = useForm({
+  const { register, handleSubmit, watch, control } = useForm({
     defaultValues: {
       groupName: "",
       membersCount: "",
@@ -31,10 +33,18 @@ const CreateGroupForm = () => {
     }
   }, [membersCount, append, remove, fields.length]);
 
+  const onSubmit =async (data) => {
+    // console.log("Form Data:", data);
+    const groupInfo = {
+      groupName: data.groupName,
+      membersCount: parseInt(data.membersCount),
+      members: data.members,
+    };
+    console.log(groupInfo)
 
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
+    const res = await axios.post(`http://localhost:5000/group`,groupInfo);
+    console.log(res)
   };
 
   return (
@@ -55,6 +65,7 @@ const CreateGroupForm = () => {
         <input
           type="number"
           placeholder="Members in group"
+          min={0}
           {...register("membersCount", { required: true, min: 1 })}
           className="w-full border-2 p-2 rounded-lg"
         />
