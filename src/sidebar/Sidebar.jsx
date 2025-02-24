@@ -10,7 +10,7 @@ const Sidebar = () => {
     { name: "Home", linkTo: "home", icon: <Home size={20} />, key: "home" },
     {
       name: "Calculator",
-      linkTo: "",
+      linkTo: "calculator",
       icon: <Calculator size={20} />,
       key: "calculator",
     },
