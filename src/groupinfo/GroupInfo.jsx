@@ -1,29 +1,23 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import GroupTable from "../utils/GroupTable";
+import { useQuery } from "@tanstack/react-query";
 
 const GroupInfo = () => {
-  const [info, setInfo] = useState([]);
+  const { data: groups = [] } = useQuery({
+    queryKey: [`group`],
+    queryFn: async () => {
+      const res = await axios.get("http://localhost:5000/groupInfo");
+      return res.data;
+    },
+  });
+  console.log(groups)
 
-  useEffect(() => {
-    getData()
-  }, []);
-
-  const getData = async () => {
-    const { data } = await axios.get("http://localhost:5000/groupInfo");
-    setInfo(data)
-    console.log(data)
-  };
-
-  return(
+  return (
     <div>
-        {/* {
-            info.map((group)=><GroupTable key={group._id} 
-            groups={group}></GroupTable>)
-        } */}
-        <GroupTable groups={info}></GroupTable>
+      <GroupTable groups={groups}></GroupTable>
     </div>
-  )
+  );
 };
 
 export default GroupInfo;

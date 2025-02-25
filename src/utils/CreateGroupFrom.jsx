@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import axios from 'axios';
-
+import { v4 as uuidv4 } from 'uuid'; // Import UUID for generating unique IDs
 
 const CreateGroupForm = () => {
   const { register, handleSubmit, watch, control } = useForm({
@@ -13,7 +13,7 @@ const CreateGroupForm = () => {
   });
 
   const membersCount = watch("membersCount");
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control,
     name: "members",
   });
@@ -24,7 +24,7 @@ const CreateGroupForm = () => {
 
     if (count > fields.length) {
       for (let i = fields.length; i < count; i++) {
-        append({ name: "", amount: "" });
+        append({ id: uuidv4(), name: "", amount: 0 });
       }
     } else if (count < fields.length) {
       for (let i = fields.length; i > count; i--) {
@@ -33,18 +33,23 @@ const CreateGroupForm = () => {
     }
   }, [membersCount, append, remove, fields.length]);
 
-  const onSubmit =async (data) => {
-    // console.log("Form Data:", data);
+  const onSubmit = async (data) => {
     const groupInfo = {
       groupName: data.groupName,
       membersCount: parseInt(data.membersCount),
-      members: data.members,
+      members: data.members.map(member => ({
+        id: member.id,
+        name: member.name,
+        amount: parseFloat(member.amount), // Ensure amount is a number
+      })),
     };
-    // console.log(groupInfo)
 
-
-    const res = await axios.post(`http://localhost:5000/group`,groupInfo);
-    console.log(res)
+    try {
+      const res = await axios.post(`http://localhost:5000/group`, groupInfo);
+      console.log("Response:", res.data);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   return (
@@ -56,12 +61,7 @@ const CreateGroupForm = () => {
           {...register("groupName", { required: true })}
           className="w-full border-2 p-2 rounded-lg"
         />
-        {/* <input
-          type="number"
-          placeholder="Total amount"
-          {...register("totalAmount", { required: true, min: 1 })}
-          className="w-full border-2 p-2 rounded-lg"
-        /> */}
+
         <input
           type="number"
           placeholder="Members in group"
@@ -82,7 +82,7 @@ const CreateGroupForm = () => {
             <input
               type="number"
               placeholder="Member amount"
-              {...register(`members.${index}.amount`, { required: true })}
+              {...register(`members.${index}.amount`, { required: true, valueAsNumber: true })}
               className="w-full border-2 p-2 rounded-lg"
             />
           </div>
