@@ -15,13 +15,32 @@ const { Header, Sider, Content } = Layout;
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const sampleData = [
-  { date: "2025-02-20", expense: 50 },
-  { date: "2025-02-21", expense: 70 },
-  { date: "2025-02-22", expense: 40 },
-  { date: "2025-02-23", expense: 90 },
-  { date: "2025-02-24", expense: 60 },
-];
-
+    { date: "2025-02-20", expense: 50 },
+    { date: "2025-02-21", expense: 70 },
+    { date: "2025-02-22", expense: 40 },
+    { date: "2025-02-23", expense: 90 },
+    { date: "2025-02-24", expense: 60 },
+    { date: "2025-02-25", expense: 75 },
+    { date: "2025-02-26", expense: 65 },
+    { date: "2025-02-27", expense: 85 },
+    { date: "2025-02-28", expense: 45 },
+    { date: "2025-03-01", expense: 95 },
+    { date: "2025-03-02", expense: 55 },
+    { date: "2025-03-03", expense: 70 },
+    { date: "2025-03-04", expense: 60 },
+    { date: "2025-03-05", expense: 80 },
+    { date: "2025-03-06", expense: 50 },
+    { date: "2025-03-07", expense: 90 },
+    { date: "2025-03-08", expense: 65 },
+    { date: "2025-03-09", expense: 75 },
+    { date: "2025-03-10", expense: 85 },
+    { date: "2025-03-11", expense: 55 },
+    { date: "2025-03-12", expense: 95 },
+    { date: "2025-03-13", expense: 60 },
+    { date: "2025-03-14", expense: 70 },
+    { date: "2025-03-15", expense: 80 },
+    { date: "2025-03-16", expense: 45 },
+  ];
 export default function ExpenseChart() {
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const filteredData = sampleData.filter(
@@ -29,7 +48,7 @@ export default function ExpenseChart() {
   );
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 ml-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Daily Expense Chart</h2>
         <DatePicker

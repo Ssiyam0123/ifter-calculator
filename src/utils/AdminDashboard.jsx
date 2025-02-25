@@ -1,17 +1,21 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Menu, Layout } from "antd";
 import {
   DashboardOutlined,
   UserOutlined,
   SettingOutlined,
   LogoutOutlined,
+  LoginOutlined,
 } from "@ant-design/icons";
 import ExpenseChart from "./ExpenseChart";
+import { AuthContext } from "../context/AuthProvider";
 
 const { Header, Sider, Content } = Layout;
 
 export default function AdminDashboard() {
   const [collapsed, setCollapsed] = useState(false);
+  const { user, signInWithGoogle, logOut } = useContext(AuthContext);
+  // console.log(name);
 
   return (
     <Layout className="min-h-screen">
@@ -28,14 +32,19 @@ export default function AdminDashboard() {
           <Menu.Item key="1" icon={<DashboardOutlined />}>
             Dashboard
           </Menu.Item>
-          <Menu.Item key="2" icon={<UserOutlined />}>
-            Users
-          </Menu.Item>
+          {user && (
+            <Menu.Item key="2" icon={<UserOutlined />}>
+              Users
+            </Menu.Item>
+          )}
           <Menu.Item key="3" icon={<SettingOutlined />}>
             Settings
           </Menu.Item>
-          <Menu.Item key="4" icon={<LogoutOutlined />}>
-            Logout
+          <Menu.Item onClick={user? logOut : signInWithGoogle}
+            key="4"
+            icon={user ? <LogoutOutlined /> : <LoginOutlined />}
+          >
+            {user ? "Logout" : "LogIn"}
           </Menu.Item>
         </Menu>
       </Sider>
@@ -47,7 +56,7 @@ export default function AdminDashboard() {
           <h2 className="text-xl font-medium">Welcome to the Admin Dashboard!</h2>
           <p className="mt-2 text-gray-600">Manage your application settings, users, and more.</p>
         </Content> */}
-        <ExpenseChart/>
+        <ExpenseChart />
       </Layout>
     </Layout>
   );
