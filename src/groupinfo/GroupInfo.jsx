@@ -4,7 +4,7 @@ import GroupTable from "../utils/GroupTable";
 import { useQuery } from "@tanstack/react-query";
 
 const GroupInfo = () => {
-  const { data: groups = [] } = useQuery({
+  const { data: groups = [], refetch } = useQuery({
     queryKey: [`group`],
     queryFn: async () => {
       const res = await axios.get("http://localhost:5000/groupInfo");
@@ -15,7 +15,7 @@ const GroupInfo = () => {
 
   return (
     <div>
-      <GroupTable groups={groups}></GroupTable>
+      <GroupTable groups={groups} refetch={refetch}></GroupTable>
     </div>
   );
 };

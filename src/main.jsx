@@ -18,6 +18,9 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import AuthProvider from "./context/AuthProvider.jsx";
+import HomePage from "./sidebar/Home/HomePage.jsx";
+import ExpenseChart from "./utils/ExpenseChart.jsx";
+import GroupTable from "./utils/GroupTable.jsx";
 const queryClient = new QueryClient();
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -26,11 +29,9 @@ createRoot(document.getElementById("root")).render(
         <BrowserRouter>
           <Routes>
             <Route path="" element={<AdminDashboard />}>
-              <Route path="home" element={<Home />} />
-              <Route path="calculator" element={<Calculator />} />
-              <Route path="createGroup" element={<CreateGroupForm />} />
-              <Route path="setting" element={<AdminDashboard />} />
-              <Route path="groupInfo" element={<GroupInfo />} />
+              <Route path="dashboard" element={<ExpenseChart />} />
+              <Route path="users" element={<CreateGroupForm />} />
+              <Route path="table" element={<GroupInfo />} />
             </Route>
           </Routes>
         </BrowserRouter>

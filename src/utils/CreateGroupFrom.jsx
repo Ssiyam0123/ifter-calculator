@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid'; // Import UUID for generating unique IDs
+import { AuthContext } from "../context/AuthProvider";
 
 const CreateGroupForm = () => {
+  const {user} = useContext(AuthContext)
   const { register, handleSubmit, watch, control } = useForm({
     defaultValues: {
       groupName: "",
@@ -43,6 +45,7 @@ const CreateGroupForm = () => {
         amount: parseFloat(member.amount), // Ensure amount is a number
       })),
     };
+
 
     try {
       const res = await axios.post(`http://localhost:5000/group`, groupInfo);

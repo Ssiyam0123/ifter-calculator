@@ -5,7 +5,7 @@ import axios from "axios";
 
 Modal.setAppElement("#root");
 
-const GroupTable = ({ groups }) => {
+const GroupTable = ({ groups, refetch }) => {
   const [editingGroupId, setEditingGroupId] = useState(null);
   const [editingMemberId, setEditingMemberId] = useState(null); // Track editing state for members' names
   const [editedMemberName, setEditedMemberName] = useState(""); // Store the new name for editing
@@ -13,15 +13,16 @@ const GroupTable = ({ groups }) => {
   const [modalAction, setModalAction] = useState(null);
   const [modalValue, setModalValue] = useState(0);
   const [modalGroupId, setModalGroupId] = useState(null);
-  const [modalMemberIndex, setModalMemberIndex] = useState(null);
+  const [modalMemberId, setModalMemberIndex] = useState(null);
 
-  const openModal = (action, groupId, memberIndex) => {
+  const openModal = (action, groupId, memberId) => {
     console.log("Opening modal for group ID:", groupId);
     setModalAction(action);
     setModalGroupId(groupId);
-    setModalMemberIndex(memberIndex);
+    setModalMemberIndex(memberId);
+    console.log(memberId)
 
-    const memberAmount = groups.find((group) => group._id === groupId)?.members[memberIndex]?.amount;
+    const memberAmount = groups.find((group) => group._id === groupId)?.members[memberId]?.amount;
     setModalValue(Number(memberAmount) || 0);
 
     setModalIsOpen(true);
@@ -34,15 +35,15 @@ const GroupTable = ({ groups }) => {
     setModalMemberIndex(null);
   };
 
-  const handleModalSubmit = () => {
+  const handleModalSubmit =async () => {
     console.log("Submitting modal for group ID:", modalGroupId);
 
-    if (!modalGroupId || modalMemberIndex === null) return;
+    if (!modalGroupId || modalMemberId === null) return;
 
     const updatedGroups = groups?.map((group) => {
       if (group._id === modalGroupId) {
-        const updatedMembers = group.members.map((member, index) => {
-          if (index === modalMemberIndex) {
+        const updatedMembers = group.members.map((member) => {
+          if (member.id === modalMemberId) {
             let newAmount = Number(member.amount);
             if (modalAction === "Add Money") newAmount += modalValue;
             if (modalAction === "Deposit Money") newAmount = Math.max(newAmount - modalValue, 0);
@@ -55,7 +56,19 @@ const GroupTable = ({ groups }) => {
       return group;
     });
 
-    console.log("Updated Groups:", updatedGroups);
+    // console.log("Updated Groups:", updatedGroups);
+    // console.log(modalValue)
+
+    const res = await axios.patch(`http://localhost:5000/update/${modalGroupId}/userId/${modalMemberId}`,
+      {
+        amount: modalValue
+      }
+    )
+
+    console.log(res.data)
+    refetch()
+
+
     closeModal();
   };
 
@@ -77,9 +90,10 @@ const GroupTable = ({ groups }) => {
     console.log("Updated Groups with new member name:", updatedGroups);
   };
 
-  const handleDelete = async (id) =>{
-    const res = await axios.delete(`http://localhost:5000/delete-group-member/${id}`)
+  const handleDelete = async (userid,groupId) =>{
+    const res = await axios.delete(`http://localhost:5000/group/${groupId}/members/${userid}`)
     console.log(res.data)
+    refetch()
   }
 
   return (
@@ -170,7 +184,7 @@ const GroupTable = ({ groups }) => {
                         </td>
                         <td className="border border-gray-200 px-2 py-1 flex justify-center gap-2">
                           <button
-                            onClick={() => openModal("Add Money", group._id, index)}
+                            onClick={() => openModal("Add Money", group._id, member.id)}
                             className="text-blue-500 hover:text-blue-700"
                             title="Add Money"
                           >
@@ -184,7 +198,7 @@ const GroupTable = ({ groups }) => {
                             <DollarSign size={18} />
                           </button>
                           <button
-                            onClick={() => handleDelete(member.id)}
+                            onClick={() => handleDelete(member.id,group._id)}
                             className="text-red-500 hover:text-red-700"
                             title="Delete Member"
                           >
@@ -213,7 +227,7 @@ const GroupTable = ({ groups }) => {
         <p className="text-sm text-gray-600 mb-2">Group ID: {modalGroupId}</p>
         <input
           type="number"
-          value={modalValue}
+          min={1}
           onChange={(e) => setModalValue(Number(e.target.value))}
           placeholder="Enter amount"
           className="w-full p-2 border rounded mb-4"
