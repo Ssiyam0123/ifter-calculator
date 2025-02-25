@@ -6,6 +6,7 @@ import {
   SettingOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
+import ExpenseChart from "./ExpenseChart";
 
 const { Header, Sider, Content } = Layout;
 
@@ -39,13 +40,14 @@ export default function AdminDashboard() {
         </Menu>
       </Sider>
       <Layout>
-        <Header className="bg-white shadow px-4 flex justify-between items-center">
+        {/* <Header className="bg-white shadow px-4 flex justify-between items-center">
           <h1 className="text-2xl font-semibold">Admin Panel</h1>
         </Header>
         <Content className="m-4 p-4 bg-white rounded shadow min-h-[80vh]">
           <h2 className="text-xl font-medium">Welcome to the Admin Dashboard!</h2>
           <p className="mt-2 text-gray-600">Manage your application settings, users, and more.</p>
-        </Content>
+        </Content> */}
+        <ExpenseChart/>
       </Layout>
     </Layout>
   );
