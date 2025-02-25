@@ -40,7 +40,7 @@ const CreateGroupForm = () => {
       membersCount: parseInt(data.membersCount),
       members: data.members,
     };
-    console.log(groupInfo)
+    // console.log(groupInfo)
 
 
     const res = await axios.post(`http://localhost:5000/group`,groupInfo);
