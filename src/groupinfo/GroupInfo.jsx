@@ -1,17 +1,21 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import GroupTable from "../utils/GroupTable";
 import { useQuery } from "@tanstack/react-query";
+import { AuthContext } from "../context/AuthProvider";
 
 const GroupInfo = () => {
+  const { user } = useContext(AuthContext);
+  const email = user?.email;
+  console.log(email);
   const { data: groups = [], refetch } = useQuery({
-    queryKey: [`group`],
+    queryKey: [`group`, email],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:5000/groupInfo");
+      const res = await axios.get(`http://localhost:5000/groupInfo/${email}`, { email });
       return res.data;
     },
   });
-  console.log(groups)
+  console.log(groups);
 
   return (
     <div>

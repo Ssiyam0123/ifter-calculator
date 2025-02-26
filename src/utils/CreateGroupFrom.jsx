@@ -1,11 +1,11 @@
 import React, { useContext, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid'; // Import UUID for generating unique IDs
+import axios from "axios";
+import { v4 as uuidv4 } from "uuid"; // Import UUID for generating unique IDs
 import { AuthContext } from "../context/AuthProvider";
 
 const CreateGroupForm = () => {
-  const {user} = useContext(AuthContext)
+  const { user } = useContext(AuthContext);
   const { register, handleSubmit, watch, control } = useForm({
     defaultValues: {
       groupName: "",
@@ -38,14 +38,14 @@ const CreateGroupForm = () => {
   const onSubmit = async (data) => {
     const groupInfo = {
       groupName: data.groupName,
+      groupAdmin: user?.email,
       membersCount: parseInt(data.membersCount),
-      members: data.members.map(member => ({
+      members: data.members.map((member) => ({
         id: member.id,
         name: member.name,
         amount: parseFloat(member.amount), // Ensure amount is a number
       })),
     };
-
 
     try {
       const res = await axios.post(`http://localhost:5000/group`, groupInfo);
@@ -85,7 +85,10 @@ const CreateGroupForm = () => {
             <input
               type="number"
               placeholder="Member amount"
-              {...register(`members.${index}.amount`, { required: true, valueAsNumber: true })}
+              {...register(`members.${index}.amount`, {
+                required: true,
+                valueAsNumber: true,
+              })}
               className="w-full border-2 p-2 rounded-lg"
             />
           </div>
