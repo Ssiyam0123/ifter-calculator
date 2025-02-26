@@ -14,12 +14,14 @@ const GroupTable = ({ groups, refetch }) => {
   const [modalValue, setModalValue] = useState(0);
   const [modalGroupId, setModalGroupId] = useState(null);
   const [modalMemberId, setModalMemberIndex] = useState(null);
+  const [currentStatus,setCurrentStatus]= useState('')
 
-  const openModal = (action, groupId, memberId) => {
+  const openModal = (action, groupId, memberId, status) => {
     console.log("Opening modal for group ID:", groupId);
     setModalAction(action);
     setModalGroupId(groupId);
     setModalMemberIndex(memberId);
+    setCurrentStatus(status)
     console.log(memberId)
 
     const memberAmount = groups.find((group) => group._id === groupId)?.members[memberId]?.amount;
@@ -59,7 +61,7 @@ const GroupTable = ({ groups, refetch }) => {
     // console.log("Updated Groups:", updatedGroups);
     // console.log(modalValue)
 
-    const res = await axios.patch(`http://localhost:5000/update/${modalGroupId}/userId/${modalMemberId}`,
+    const res = await axios.patch(`http://localhost:5000/update/${modalGroupId}/userId/${modalMemberId}/?sort=${currentStatus}`,
       {
         amount: modalValue
       }
@@ -184,14 +186,14 @@ const GroupTable = ({ groups, refetch }) => {
                         </td>
                         <td className="border border-gray-200 px-2 py-1 flex justify-center gap-2">
                           <button
-                            onClick={() => openModal("Add Money", group._id, member.id)}
+                            onClick={() => openModal("Add Money", group._id, member.id,'inc')}
                             className="text-blue-500 hover:text-blue-700"
                             title="Add Money"
                           >
                             <PlusCircle size={18} />
                           </button>
                           <button
-                            onClick={() => openModal("Deposit Money", group._id, index)}
+                            onClick={() => openModal("Deposit Money", group._id, member.id,'dec')}
                             className="text-yellow-500 hover:text-yellow-700"
                             title="Deposit Money"
                           >
