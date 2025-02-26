@@ -7,24 +7,29 @@ Modal.setAppElement("#root");
 
 const GroupTable = ({ groups, refetch }) => {
   const [editingGroupId, setEditingGroupId] = useState(null);
-  const [editingMemberId, setEditingMemberId] = useState(null); // Track editing state for members' names
-  const [editedMemberName, setEditedMemberName] = useState(""); // Store the new name for editing
+  const [editingMemberId, setEditingMemberId] = useState(null);
+  const [editedMemberName, setEditedMemberName] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [modalValue, setModalValue] = useState(0);
   const [modalGroupId, setModalGroupId] = useState(null);
   const [modalMemberId, setModalMemberIndex] = useState(null);
-  const [currentStatus,setCurrentStatus]= useState('')
+  const [currentStatus, setCurrentStatus] = useState('');
+
+  const calculateTotalAmount = () => {
+    return groups.reduce((groupSum, group) => {
+      const groupTotal = group.members.reduce((memberSum, member) => memberSum + member.amount, 0);
+      return groupSum + groupTotal;
+    }, 0);
+  };
 
   const openModal = (action, groupId, memberId, status) => {
-    console.log("Opening modal for group ID:", groupId);
     setModalAction(action);
     setModalGroupId(groupId);
     setModalMemberIndex(memberId);
-    setCurrentStatus(status)
-    console.log(memberId)
+    setCurrentStatus(status);
 
-    const memberAmount = groups.find((group) => group._id === groupId)?.members[memberId]?.amount;
+    const memberAmount = groups.find((group) => group._id === groupId)?.members.find((m) => m.id === memberId)?.amount;
     setModalValue(Number(memberAmount) || 0);
 
     setModalIsOpen(true);
@@ -37,53 +42,22 @@ const GroupTable = ({ groups, refetch }) => {
     setModalMemberIndex(null);
   };
 
-  const handleModalSubmit =async () => {
-    console.log("Submitting modal for group ID:", modalGroupId);
-
+  const handleModalSubmit = async () => {
     if (!modalGroupId || modalMemberId === null) return;
 
-    const updatedGroups = groups?.map((group) => {
-      if (group._id === modalGroupId) {
-        const updatedMembers = group.members.map((member) => {
-          if (member.id === modalMemberId) {
-            let newAmount = Number(member.amount);
-            if (modalAction === "Add Money") newAmount += modalValue;
-            if (modalAction === "Deposit Money") newAmount = Math.max(newAmount - modalValue, 0);
-            return { ...member, amount: newAmount };
-          }
-          return member;
-        });
-        return { ...group, members: updatedMembers };
-      }
-      return group;
-    });
+    await axios.patch(
+      `http://localhost:5000/update/${modalGroupId}/userId/${modalMemberId}/?sort=${currentStatus}`,
+      { amount: modalValue }
+    );
 
-    // console.log("Updated Groups:", updatedGroups);
-    // console.log(modalValue)
-
-    const res = await axios.patch(`http://localhost:5000/update/${modalGroupId}/userId/${modalMemberId}/?sort=${currentStatus}`,
-      {
-        amount: modalValue
-      }
-    )
-
-    console.log(res.data)
-    refetch()
-
-
+    refetch();
     closeModal();
   };
 
   const handleMemberNameChange = (index, newName) => {
-    // Update the member's name in the group when the user finishes editing
     const updatedGroups = groups?.map((group) => {
       if (group._id === modalGroupId) {
-        const updatedMembers = group.members.map((member, idx) => {
-          if (idx === index) {
-            return { ...member, name: newName };
-          }
-          return member;
-        });
+        const updatedMembers = group.members.map((member, idx) => (idx === index ? { ...member, name: newName } : member));
         return { ...group, members: updatedMembers };
       }
       return group;
@@ -92,11 +66,10 @@ const GroupTable = ({ groups, refetch }) => {
     console.log("Updated Groups with new member name:", updatedGroups);
   };
 
-  const handleDelete = async (userid,groupId) =>{
-    const res = await axios.delete(`http://localhost:5000/group/${groupId}/members/${userid}`)
-    console.log(res.data)
-    refetch()
-  }
+  const handleDelete = async (userid, groupId) => {
+    await axios.delete(`http://localhost:5000/group/${groupId}/members/${userid}`);
+    refetch();
+  };
 
   return (
     <div className="p-6 overflow-x-auto">
@@ -115,9 +88,7 @@ const GroupTable = ({ groups, refetch }) => {
                   type="text"
                   defaultValue={group.groupName}
                   readOnly={editingGroupId !== group._id}
-                  className={`w-full px-2 py-1 rounded ${
-                    editingGroupId === group._id ? "border border-blue-500" : "border-transparent"
-                  }`}
+                  className={`w-full px-2 py-1 rounded ${editingGroupId === group._id ? "border border-blue-500" : "border-transparent"}`}
                   onBlur={() => setEditingGroupId(null)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
@@ -153,21 +124,17 @@ const GroupTable = ({ groups, refetch }) => {
                             type="text"
                             value={editingMemberId === index ? editedMemberName : member.name}
                             readOnly={editingMemberId !== index}
-                            onChange={(e) => {
-                              if (editingMemberId === index) {
-                                setEditedMemberName(e.target.value);
-                              }
-                            }}
+                            onChange={(e) => editingMemberId === index && setEditedMemberName(e.target.value)}
                             className="px-2 py-1 rounded w-full border border-transparent"
                           />
                           <button
                             onClick={() => {
                               if (editingMemberId === index) {
                                 handleMemberNameChange(index, editedMemberName);
-                                setEditingMemberId(null); // Stop editing after submitting
+                                setEditingMemberId(null);
                               } else {
                                 setEditingMemberId(index);
-                                setEditedMemberName(member.name); // Set initial name when editing starts
+                                setEditedMemberName(member.name);
                               }
                             }}
                             className="text-blue-500 hover:text-blue-700"
@@ -185,25 +152,13 @@ const GroupTable = ({ groups, refetch }) => {
                           />
                         </td>
                         <td className="border border-gray-200 px-2 py-1 flex justify-center gap-2">
-                          <button
-                            onClick={() => openModal("Add Money", group._id, member.id,'inc')}
-                            className="text-blue-500 hover:text-blue-700"
-                            title="Add Money"
-                          >
+                          <button onClick={() => openModal("Add Money", group._id, member.id, 'inc')} className="text-blue-500 hover:text-blue-700" title="Add Money">
                             <PlusCircle size={18} />
                           </button>
-                          <button
-                            onClick={() => openModal("Deposit Money", group._id, member.id,'dec')}
-                            className="text-yellow-500 hover:text-yellow-700"
-                            title="Deposit Money"
-                          >
+                          <button onClick={() => openModal("Deposit Money", group._id, member.id, 'dec')} className="text-yellow-500 hover:text-yellow-700" title="Deposit Money">
                             <DollarSign size={18} />
                           </button>
-                          <button
-                            onClick={() => handleDelete(member.id,group._id)}
-                            className="text-red-500 hover:text-red-700"
-                            title="Delete Member"
-                          >
+                          <button onClick={() => handleDelete(member.id, group._id)} className="text-red-500 hover:text-red-700" title="Delete Member">
                             <Trash2 size={18} />
                           </button>
                         </td>
@@ -217,7 +172,10 @@ const GroupTable = ({ groups, refetch }) => {
         </tbody>
       </table>
 
-      {/* Modal */}
+      <div className="mt-6 text-right">
+        <p className="text-lg font-semibold">Total Amount: <span className="text-green-600">${calculateTotalAmount()}</span></p>
+      </div>
+
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}

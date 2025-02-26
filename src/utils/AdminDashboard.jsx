@@ -6,11 +6,14 @@ import {
   SettingOutlined,
   LogoutOutlined,
   LoginOutlined,
+  HomeOutlined,
+  ProfileOutlined,
 } from "@ant-design/icons";
 import ExpenseChart from "./ExpenseChart";
 import { AuthContext } from "../context/AuthProvider";
 import HomePage from "../sidebar/Home/HomePage";
 import { Outlet, useNavigate } from "react-router";
+import { BarChart2Icon } from "lucide-react";
 
 const { Header, Sider, Content } = Layout;
 
@@ -32,16 +35,16 @@ export default function AdminDashboard() {
           {collapsed ? "AD" : "Admin Dashboard"}
         </div>
         <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
-          <Menu.Item key="1" onClick={()=>navigate('dashboard')} icon={<DashboardOutlined />}>
-            Dashboard
+          <Menu.Item key="1" onClick={()=>navigate('dashboard')} icon={<HomeOutlined />}>
+            Home
           </Menu.Item>
           {user && (
-            <Menu.Item onClick={()=> navigate('/users')} key="2" icon={<UserOutlined />}>
+            <Menu.Item onClick={()=> navigate('/users')} key="2" icon={<BarChart2Icon />}>
               Users
             </Menu.Item>
           )}
-          <Menu.Item key="3" onClick={()=>navigate('table')} icon={<SettingOutlined />}>
-            Settings
+          <Menu.Item key="3" onClick={()=>navigate('table')} icon={<ProfileOutlined />}>
+            Profile
           </Menu.Item>
           <Menu.Item onClick={user? logOut : signInWithGoogle}
             key="4"
