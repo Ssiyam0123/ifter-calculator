@@ -21,6 +21,8 @@ import AuthProvider from "./context/AuthProvider.jsx";
 import HomePage from "./sidebar/Home/HomePage.jsx";
 import ExpenseChart from "./utils/ExpenseChart.jsx";
 import GroupTable from "./utils/GroupTable.jsx";
+import ExpenseSummary from "./sidebar/Home/ExpenseSummary.jsx";
+import ExpenseSummaryBar from "./sidebar/stats/ExpenseSummaryBar.jsx";
 const queryClient = new QueryClient();
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -30,6 +32,8 @@ createRoot(document.getElementById("root")).render(
           <Routes>
             <Route path="" element={<AdminDashboard />}>
               <Route path="dashboard" element={<ExpenseChart />} />
+              <Route path="home" element={<ExpenseSummary />} />
+              <Route path="stats" element={<ExpenseSummaryBar />} />
               <Route path="users" element={<CreateGroupForm />} />
               <Route path="table" element={<GroupInfo />} />
             </Route>

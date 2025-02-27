@@ -21,7 +21,7 @@ export default function AdminDashboard() {
   const [collapsed, setCollapsed] = useState(false);
   const { user, signInWithGoogle, logOut } = useContext(AuthContext);
   const navigate = useNavigate()
-  // console.log(name);
+  console.log(name);
 
   return (
     <Layout className="min-h-screen">
@@ -35,12 +35,12 @@ export default function AdminDashboard() {
           {collapsed ? "AD" : "Admin Dashboard"}
         </div>
         <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
-          <Menu.Item key="1" onClick={()=>navigate('dashboard')} icon={<HomeOutlined />}>
+          <Menu.Item key="1" onClick={()=>navigate('home')} icon={<HomeOutlined />}>
             Home
           </Menu.Item>
           {user && (
-            <Menu.Item onClick={()=> navigate('/users')} key="2" icon={<BarChart2Icon />}>
-              Users
+            <Menu.Item onClick={()=> navigate('stats')} key="2" icon={<BarChart2Icon />}>
+              Stats
             </Menu.Item>
           )}
           <Menu.Item key="3" onClick={()=>navigate('table')} icon={<ProfileOutlined />}>
