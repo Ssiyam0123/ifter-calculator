@@ -5,12 +5,14 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { AuthContext } from "../context/AuthProvider";
 import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 
 export default function TransactionModal({
   isOpen,
   onClose,
   modalState,
   refetch,
+  currentId
 }) {
   const { user } = useContext(AuthContext);
   const [transactionType, setTransactionType] = useState("expense");
@@ -25,7 +27,8 @@ export default function TransactionModal({
       onClose();
     }
   };
-  console.log(modalState);
+//   console.log(modalState);
+//   console.log(currentId)
 
   const handleSubmit = async () => {
     const data = {
@@ -51,6 +54,30 @@ export default function TransactionModal({
     }
   };
 
+
+  const { data: currentData = [], } = useQuery({
+    queryKey: [`${user?.email}`],
+    queryFn: async () => {
+      const { data } = await axios.get(`http://localhost:5000/getData/${currentId}`);
+      return data;
+    },
+  });
+  console.log(currentData)
+
+  const thatDate = currentData?.date
+
+  const handleDelete = async (id) =>{
+    const res = await axios.delete(`http://localhost:5000/delete/${id}`);
+    console.log(res.data);
+    refetch()
+    if (onClose) {
+        onClose();
+      }
+    
+  }
+
+
+
   if (modalState == "addsumm") {
     return (
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -59,7 +86,7 @@ export default function TransactionModal({
             <div className="flex justify-between">
               <h2 className="text-lg font-semibold mb-4">New Transaction</h2>
               <button
-                onClick={handleModalClose}
+                onClick={()=>handleModalClose()}
                 className="text-lg font-semibold mb-4"
               >
                 Close
@@ -178,7 +205,8 @@ export default function TransactionModal({
                 <label className="text-sm font-medium">Category</label>
                 <input
                   type="text"
-                  value={category}
+                  defaultValue={currentData.category}
+                //   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   placeholder="Search category..."
                   className="w-full p-2 border rounded mt-1"
@@ -197,7 +225,8 @@ export default function TransactionModal({
               <div className="mb-4">
                 <input
                   type="number"
-                  value={amount}
+                //   value={amount}
+                  defaultValue={currentData?.amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="Enter amount..."
                   className="w-full p-2 border rounded"
@@ -206,7 +235,8 @@ export default function TransactionModal({
               <div className="mb-4">
                 <input
                   type="text"
-                  value={note}
+                //   value={note}
+                  defaultValue={currentData?.note}
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="Add a note..."
                   className="w-full p-2 border rounded"
@@ -217,7 +247,10 @@ export default function TransactionModal({
                 className="w-full p-2 bg-blue-500 text-white rounded disabled:opacity-50"
                 disabled={amount <= 0}
               >
-                Add {transactionType}
+                Update {transactionType}
+              </button>
+              <button onClick={()=>handleDelete(currentData?._id)} className="w-full p-2 bg-red-500 text-white rounded disabled:opacity-50">
+                Delete
               </button>
             </div>
           </div>

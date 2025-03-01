@@ -10,39 +10,64 @@ const ExpenseSummary = () => {
   const { user } = useContext(AuthContext);
   const email = user?.email;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalState, setIsModalState] = useState('trans')
+  const [modalState, setIsModalState] = useState("trans");
+  const [currentId, setCurrentId] = useState("");
 
   // Fetching transactions
   const { data: myData = [], refetch } = useQuery({
     queryKey: [`${user?.email}`],
     queryFn: async () => {
       const { data } = await axios.get(`http://localhost:5000/mydata/${email}`);
-      return data;
+      return Array.isArray(data) ? data : [];
     },
   });
 
   // Filter expenses and income
-  const expenses = myData.filter((item) => item.transactionType === "expense");
-  const income = myData.filter((item) => item.transactionType === "income");
+  // const expenses = myData?.filter((item) => item.transactionType === "expense");
+  // const income = myData?.filter((item) => item.transactionType === "income");
 
-  const totalExpense = myData
-    .filter((item) => item.transactionType === "expense")
-    .reduce((acc, item) => acc + item.amount, 0);
-  const totalIncome = myData
-    .filter((item) => item.transactionType === "income")
-    .reduce((acc, item) => acc + item.amount, 0);
+  const expenses = Array.isArray(myData)
+    ? myData.filter((item) => item.transactionType === "expense")
+    : [];
+
+  const income = Array.isArray(myData)
+    ? myData.filter((item) => item.transactionType === "income")
+    : [];
+
+  // const totalExpense = myData
+  //   .filter((item) => item.transactionType === "expense")
+  //   .reduce((acc, item) => acc + item.amount, 0);
+  // const totalIncome = myData
+  //   .filter((item) => item.transactionType === "income")
+  //   .reduce((acc, item) => acc + item.amount, 0);
+  // const balance = totalIncome - totalExpense;
+  // console.log(balance);
+  // console.log(myData);
+
+  const totalExpense = Array.isArray(myData)
+    ? myData
+        .filter((item) => item.transactionType === "expense")
+        .reduce((acc, item) => acc + (item.amount || 0), 0)
+    : 0;
+
+  const totalIncome = Array.isArray(myData)
+    ? myData
+        .filter((item) => item.transactionType === "income")
+        .reduce((acc, item) => acc + (item.amount || 0), 0)
+    : 0;
+
   const balance = totalIncome - totalExpense;
-  console.log(balance)
-  console.log(myData)
-  const handleUpdateModal = (id)=>{
-    console.log(id)
-    setIsModalOpen(true)
-    setIsModalState('summ')
-  }
-  const addSummaryModal = () =>{
-    setIsModalOpen(true)
-    setIsModalState('addsumm')
-  }
+
+  const handleUpdateModal = (id) => {
+    console.log(id);
+    setCurrentId(id);
+    setIsModalOpen(true);
+    setIsModalState("summ");
+  };
+  const addSummaryModal = () => {
+    setIsModalOpen(true);
+    setIsModalState("addsumm");
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
@@ -70,19 +95,19 @@ const ExpenseSummary = () => {
       <div className="bg-white rounded-xl shadow p-4 space-y-2">
         <div className="flex justify-between">
           <span>Today Earnings</span>
-          <span className="text-green-600 font-semibold">$65,330.00</span>
+          <span className="text-green-600 font-semibold">${totalIncome}</span>
         </div>
         <div className="flex justify-between">
           <span>Today Expenses</span>
-          <span className="text-red-500 font-semibold">$14,272.00</span>
+          <span className="text-red-500 font-semibold">${totalExpense}</span>
         </div>
         <div className="flex justify-between border-t pt-2">
           <span>Balance</span>
-          <span className="text-blue-600 font-semibold">$51,058.00</span>
+          <span className="text-blue-600 font-semibold">${balance}</span>
         </div>
         <div className="flex justify-between border-t pt-2">
           <span>Total Amount</span>
-          <span className="text-purple-600 font-semibold">$79,602.00</span>
+          <span className="text-purple-600 font-semibold">$beyond your expectation</span>
         </div>
       </div>
 
@@ -103,9 +128,9 @@ const ExpenseSummary = () => {
           <h3 className="font-semibold text-lg text-red-500">Expenses</h3>
           {expenses.length > 0 ? (
             expenses.map((item) => (
-              <div 
+              <div
                 key={item._id}
-                onClick={()=>handleUpdateModal(item._id)}
+                onClick={() => handleUpdateModal(item._id)}
                 className="bg-white rounded-xl shadow p-4 flex gap-4 items-center mt-2"
               >
                 <div className="bg-red-100 p-3 rounded-full">
@@ -142,6 +167,7 @@ const ExpenseSummary = () => {
             income.map((item) => (
               <div
                 key={item._id}
+                onClick={() => handleUpdateModal(item._id)}
                 className="bg-white rounded-xl shadow p-4 flex gap-4 items-center mt-2"
               >
                 <div className="bg-green-100 p-3 rounded-full">
@@ -191,6 +217,7 @@ const ExpenseSummary = () => {
           onClose={() => setIsModalOpen(false)}
           modalState={modalState}
           refetch={refetch}
+          currentId={currentId}
         />
       )}
     </div>
