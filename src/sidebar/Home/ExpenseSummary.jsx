@@ -1,9 +1,22 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Search } from "lucide-react";
 import TransactionModal from "../../utils/TransactionModal";
+import { useQuery } from "@tanstack/react-query";
+import { AuthContext } from "../../context/AuthProvider";
+import axios from "axios";
 
 const ExpenseSummary = () => {
+  const {user} = useContext(AuthContext)
+  const email = user?.email
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const {data: myData = []} = useQuery({
+    queryKey: [`${user?.email}`],
+    queryFn: async () => {
+      const {data} = await axios.get(`http://localhost:5000/mydata/${email}`)
+      return data
+    }
+  })
+  console.log(myData)
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
       {/* Header with Search and Date */}

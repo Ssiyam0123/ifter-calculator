@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Dialog } from "@radix-ui/react-dialog";
 import { Popover } from "@radix-ui/react-popover";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
+import { AuthContext } from "../context/AuthProvider";
+import axios from "axios";
 
 export default function TransactionModal({ isOpen, onClose }) {
+    const {user} = useContext(AuthContext)
   const [transactionType, setTransactionType] = useState("expense");
   const [date, setDate] = useState(new Date());
   const [category, setCategory] = useState("");
@@ -17,6 +20,28 @@ export default function TransactionModal({ isOpen, onClose }) {
       onClose();
     }
   };
+
+  const handleSubmit = async () =>{
+    const data = {
+        transactionType,
+        category,
+        date,
+        amount,
+        note,
+        email: user?.email
+    }
+    console.log(data)
+    const res = await axios.post(`http://localhost:5000/dailyBasisExOrIn`,{data})
+    console.log(res.data)
+    if(res.data.acknowledged){
+        setCategory(''),
+        setAmount(0),
+        setNote('');
+    //    console.log('data uploaded')
+    }
+   
+   
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -65,7 +90,7 @@ export default function TransactionModal({ isOpen, onClose }) {
               </button>
             </Popover>
           </div>
-          <div className="mb-4 text-center text-2xl font-semibold">{amount}</div>
+         
           <div className="mb-4">
             <input
               type="number"
@@ -84,7 +109,7 @@ export default function TransactionModal({ isOpen, onClose }) {
               className="w-full p-2 border rounded"
             />
           </div>
-          <button className="w-full p-2 bg-blue-500 text-white rounded disabled:opacity-50" disabled={amount <= 0}>
+          <button onClick={handleSubmit} className="w-full p-2 bg-blue-500 text-white rounded disabled:opacity-50" disabled={amount <= 0}>
             Add {transactionType}
           </button>
         </div>
