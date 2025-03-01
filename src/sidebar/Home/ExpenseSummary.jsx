@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Search } from "lucide-react";
+import TransactionModal from "../../utils/TransactionModal";
 
 const ExpenseSummary = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
       {/* Header with Search and Date */}
@@ -12,12 +14,17 @@ const ExpenseSummary = () => {
             placeholder="Search..."
             className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none"
           />
-          <Search className="absolute right-3 top-2.5 text-gray-400" size={20} />
+          <Search
+            className="absolute right-3 top-2.5 text-gray-400"
+            size={20}
+          />
         </div>
         <select className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none">
           <option>Today</option>
-          <option>Yesterday</option>
           <option>This Week</option>
+          <option>Yesterday</option>
+          <option>This Month</option>
+          <option>This Year</option>
         </select>
       </div>
 
@@ -43,18 +50,29 @@ const ExpenseSummary = () => {
 
       {/* Tabs */}
       <div className="flex justify-center gap-2">
-        <button className="w-1/2 px-4 py-2 rounded-lg bg-blue-100 text-blue-600 font-medium">Daily</button>
-        <button className="w-1/2 px-4 py-2 rounded-lg border border-gray-300 font-medium">Recurring</button>
+        <button className="w-1/2 px-4 py-2 rounded-lg bg-blue-100 text-blue-600 font-medium">
+          Daily
+        </button>
+        <button className="w-1/2 px-4 py-2 rounded-lg border border-gray-300 font-medium">
+          Recurring
+        </button>
       </div>
 
       {/* Expenses and Income */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Expenses */}
         <div>
-          <h3 className="font-semibold text-lg text-red-500 flex items-center gap-1">Expenses</h3>
+          <h3 className="font-semibold text-lg text-red-500 flex items-center gap-1">
+            Expenses
+          </h3>
           <div className="bg-white rounded-xl shadow p-4 flex gap-4 items-center">
             <div className="bg-green-100 p-3 rounded-full">
-              <img src="https://img.icons8.com/ios-filled/50/4CAF50/money.png" alt="Bills" width={32} height={32} />
+              <img
+                src="https://img.icons8.com/ios-filled/50/4CAF50/money.png"
+                alt="Bills"
+                width={32}
+                height={32}
+              />
             </div>
             <div className="flex-1">
               <p className="font-semibold">Bills & fees</p>
@@ -67,7 +85,12 @@ const ExpenseSummary = () => {
           </div>
           <div className="bg-white rounded-xl shadow p-4 flex gap-4 items-center mt-2">
             <div className="bg-gray-100 p-3 rounded-full">
-              <img src="https://img.icons8.com/ios-filled/50/795548/home.png" alt="Home" width={32} height={32} />
+              <img
+                src="https://img.icons8.com/ios-filled/50/795548/home.png"
+                alt="Home"
+                width={32}
+                height={32}
+              />
             </div>
             <div className="flex-1">
               <p className="font-semibold">Home</p>
@@ -82,10 +105,17 @@ const ExpenseSummary = () => {
 
         {/* Income */}
         <div>
-          <h3 className="font-semibold text-lg text-green-500 flex items-center gap-1">Income</h3>
+          <h3 className="font-semibold text-lg text-green-500 flex items-center gap-1">
+            Income
+          </h3>
           <div className="bg-white rounded-xl shadow p-4 flex gap-4 items-center">
             <div className="bg-green-100 p-3 rounded-full">
-              <img src="https://img.icons8.com/ios-filled/50/4CAF50/salary.png" alt="Salary" width={32} height={32} />
+              <img
+                src="https://img.icons8.com/ios-filled/50/4CAF50/salary.png"
+                alt="Salary"
+                width={32}
+                height={32}
+              />
             </div>
             <div className="flex-1">
               <p className="font-semibold">Salary</p>
@@ -100,11 +130,20 @@ const ExpenseSummary = () => {
       </div>
 
       {/* Floating Action Button */}
-      <div className="fixed bottom-6 right-6">
-        <button className="bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600">
+      <div className="flex justify-center">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600"
+        >
           +
         </button>
       </div>
+      {isModalOpen && (
+        <TransactionModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 };
