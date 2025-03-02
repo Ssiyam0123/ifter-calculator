@@ -48,7 +48,7 @@ const CreateGroupForm = () => {
     };
 
     try {
-      const res = await axios.post(`http://localhost:5000/group`, groupInfo);
+      const res = await axios.post(`https://idk-gray-two.vercel.app/group`, groupInfo);
       console.log("Response:", res.data);
     } catch (error) {
       console.error("Error submitting form:", error);

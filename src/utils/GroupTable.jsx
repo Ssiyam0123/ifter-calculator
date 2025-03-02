@@ -46,7 +46,7 @@ const GroupTable = ({ groups, refetch }) => {
     if (!modalGroupId || modalMemberId === null) return;
 
     await axios.patch(
-      `http://localhost:5000/update/${modalGroupId}/userId/${modalMemberId}/?sort=${currentStatus}`,
+      `https://idk-gray-two.vercel.app/update/${modalGroupId}/userId/${modalMemberId}/?sort=${currentStatus}`,
       { amount: modalValue }
     );
 
@@ -67,7 +67,7 @@ const GroupTable = ({ groups, refetch }) => {
   };
 
   const handleDelete = async (userid, groupId) => {
-    await axios.delete(`http://localhost:5000/group/${groupId}/members/${userid}`);
+    await axios.delete(`https://idk-gray-two.vercel.app/group/${groupId}/members/${userid}`);
     refetch();
   };
 

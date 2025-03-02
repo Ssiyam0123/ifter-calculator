@@ -40,7 +40,7 @@ export default function TransactionModal({
       email: user?.email,
     };
     console.log(data);
-    const res = await axios.post(`http://localhost:5000/dailyBasisExOrIn`, {
+    const res = await axios.post(`https://idk-gray-two.vercel.app/dailyBasisExOrIn`, {
       data,
     });
     console.log(res.data);
@@ -58,7 +58,7 @@ export default function TransactionModal({
   const { data: currentData = [], } = useQuery({
     queryKey: [`${user?.email}`],
     queryFn: async () => {
-      const { data } = await axios.get(`http://localhost:5000/getData/${currentId}`);
+      const { data } = await axios.get(`https://idk-gray-two.vercel.app/getData/${currentId}`);
       return data;
     },
   });
@@ -67,7 +67,7 @@ export default function TransactionModal({
   const thatDate = currentData?.date
 
   const handleDelete = async (id) =>{
-    const res = await axios.delete(`http://localhost:5000/delete/${id}`);
+    const res = await axios.delete(`https://idk-gray-two.vercel.app/delete/${id}`);
     console.log(res.data);
     refetch()
     if (onClose) {

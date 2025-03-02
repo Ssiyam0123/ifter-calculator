@@ -11,7 +11,7 @@ const GroupInfo = () => {
   const { data: groups = [], refetch } = useQuery({
     queryKey: [`group`, email],
     queryFn: async () => {
-      const res = await axios.get(`http://localhost:5000/groupInfo/${email}`, { email });
+      const res = await axios.get(`https://idk-gray-two.vercel.app/groupInfo/${email}`, { email });
       return res.data;
     },
   });
